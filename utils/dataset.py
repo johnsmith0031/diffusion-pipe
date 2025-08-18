@@ -852,7 +852,9 @@ class DirectoryDataset:
 
     def _find_closest_size_bucket(self, log_ar, frames, is_video):
         # Best AR bucket is the one with the smallest AR difference in log space.
-        ar_diffs = np.abs(log_ar - self.log_ars)
+        ars = np.array([w / h for w, h, _ in self.size_buckets])
+        log_ars = np.log(ars)
+        ar_diffs = np.abs(log_ar - log_ars)
         candidate_size_buckets = self.size_buckets[np.argsort(ar_diffs, kind='stable')]
         # Find closest size bucket where the number of frames is greater than or equal to the bucket.
         # self.size_buckets was already sorted longest -> shortest frame length
@@ -867,6 +869,7 @@ class DirectoryDataset:
         if not found:
             # video not long enough to find any valid frame bucket
             return None
+        print('Found Backet:', size_bucket)
         return size_bucket
 
     def _process_user_provided_ars(self, ars):
